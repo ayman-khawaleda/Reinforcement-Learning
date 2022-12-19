@@ -1,9 +1,10 @@
 from abc import abstractmethod, ABC
 import numpy as np
-from Environment import GridEnvironment,Environment
+from Environment import GridEnvironment, Environment
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 
+np.random.seed(15)
 
 class RLAlgorithm(ABC):
     def __init__(self, env: Environment, total_episodes=10000, lr=0.5, gamma=0.9, epsilon=0.9, decay=0.99, min_epsilon=0.1):
@@ -24,7 +25,7 @@ class RLAlgorithm(ABC):
         pass
 
     @abstractmethod
-    def value_function(self,state:int,*args, **kwargs):
+    def value_function(self, state: int, *args, **kwargs):
         pass
 
 
@@ -63,23 +64,28 @@ class Qlearning(RLAlgorithm):
                 total_reward += reward
 
                 # Qt = Qt + alpha * ( (reward + gamma * max(newQ)) - Qt )
-                self.q_table[old_state_idx, action_idx] += self.lr * (reward + self.gamma * np.max(
-                    self.q_table[new_state_idx, :]) - self.q_table[old_state_idx, action_idx])
+                self.q_table[old_state_idx, action_idx] += self.lr * (reward + self.gamma * self.Q_next(
+                    new_state_idx) - self.q_table[old_state_idx, action_idx])
 
                 # End The Episode If The Agent Win Or Lose
-                if self.env.is_win() and self.env.is_lose():
+                if self.env.is_agent_win() or self.env.is_agent_lose():
                     break
 
             # Trade off Exploration & Exploitation
             self.epsilon = max(self.epsilon * self.decay, self.min_epsilon)
             self.rewards.append(total_reward)
 
-    def value_function(self, state:int):
+    def Q_next(self, state: int):
+        return np.max(self.q_table[state, :])
+
+    def value_function(self, state: int):
         return np.argmax(self.q_table[state, :])
 
     def plot_reward(self):
         plt.figure(figsize=(6, 4))
-        plt.plot(np.arange(self.total_episodes), self.rewards, color='blue')
+        plt.plot(np.arange(0, self.total_episodes, 5), [
+                 x for i, x in enumerate(self.rewards) if i % 5 == 0], color='blue')
+        # plt.plot(np.arange(self.total_episodes), self.rewards, color='blue')
         plt.xlabel('Episodes')
         plt.ylabel('Total Reward per Epidode')
         plt.show()
