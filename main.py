@@ -10,4 +10,3 @@ if __name__ == "__main__":
     q_learning.fit()
     q_learning.print_q_table()
     q_learning.plot_reward()
-    env.print_path_as_heatmap(q_learning.value_function )
