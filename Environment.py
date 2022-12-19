@@ -87,12 +87,11 @@ class GridEnvironment(Environment):
             action_idx = value_function(old_state)
             self.agent.pos = self.next_state(self.agent.actions[action_idx])
         # The Environment
-        # hm = sn.heatmap(data=self.data, linewidths=1,
+        # hm = sn.heatmap(data=data, linewidths=1,
         #                 linecolor="black", cmap='Blues', cbar=False)
         
         # What The Most Cells The Agent Visited
-        max_ = np.max(self.grid)
-        self.grid[self.start[0], self.start[1]] = max_
+        self.grid[self.start[0], self.start[1]] = iters
         
         hm = sn.heatmap(data=self.grid/iters, linewidths=0,
                         linecolor="black", cmap='Blues', cbar=False, annot=True)
