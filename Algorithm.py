@@ -48,6 +48,7 @@ class Qlearning(RLAlgorithm):
             return np.random.randint(0, self.env.agent.n_actions)
 
     def fit(self):
+        self.total_iters = 0
         for episodes in tqdm(range(self.total_episodes)):
             self.env.agent.pos = self.env.start
             total_reward = 0
@@ -68,9 +69,13 @@ class Qlearning(RLAlgorithm):
                     new_state_idx) - self.q_table[old_state_idx, action_idx])
 
                 # End The Episode If The Agent Win Or Lose
-                if self.env.is_agent_win() or self.env.is_agent_lose():
+                if self.env.is_agent_win():
+                    self.env.visit(self.env.agent.pos)
                     break
-
+                if self.env.is_agent_lose():
+                    break
+                self.env.visit(self.env.agent.pos)
+                self.total_iters += 1
             # Trade off Exploration & Exploitation
             self.epsilon = max(self.epsilon * self.decay, self.min_epsilon)
             self.rewards.append(total_reward)
