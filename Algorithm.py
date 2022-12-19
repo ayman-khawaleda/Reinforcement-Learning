@@ -24,7 +24,7 @@ class RLAlgorithm(ABC):
         pass
 
     @abstractmethod
-    def value_function(self,state):
+    def value_function(self,state:int,*args, **kwargs):
         pass
 
 
@@ -66,7 +66,7 @@ class Qlearning(RLAlgorithm):
                 self.q_table[old_state_idx, action_idx] += self.lr * (reward + self.gamma * np.max(
                     self.q_table[new_state_idx, :]) - self.q_table[old_state_idx, action_idx])
 
-                # End The Episode If You Win Or Lose
+                # End The Episode If The Agent Win Or Lose
                 if self.env.is_win() and self.env.is_lose():
                     break
 
