@@ -24,7 +24,7 @@ class RLAlgorithm(ABC):
         pass
 
     @abstractmethod
-    def value_function(self):
+    def value_function(self,state):
         pass
 
 
@@ -74,7 +74,7 @@ class Qlearning(RLAlgorithm):
             self.epsilon = max(self.epsilon * self.decay, self.min_epsilon)
             self.rewards.append(total_reward)
 
-    def value_function(self, state):
+    def value_function(self, state:int):
         return np.argmax(self.q_table[state, :])
 
     def plot_reward(self):
