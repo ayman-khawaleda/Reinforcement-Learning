@@ -24,7 +24,7 @@ class Environment:
 
 class GridEnvironment(Environment):
 
-    def __init__(self, agent: GridAgent, reward_values=[10, -10, -1], rows=5, cols=5, win_state=(3, 3), start_state=(0, 0), holes=[(1, 0), (1, 3), (3, 1), (3, 2)]) -> None:
+    def __init__(self, agent: GridAgent, reward_values=[10, -10, -1], rows=4, cols=4, win_state=(3, 3), start_state=(0, 0), holes=[(1, 0), (1, 3), (3, 1), (3, 2)]) -> None:
         super().__init__(agent,reward_values)
         self.rows = rows
         self.cols = cols
@@ -41,11 +41,14 @@ class GridEnvironment(Environment):
             return self.reward_values[1]
         return self.reward_values[2]
 
-    def is_win(self):
-        return self.agent.pos == self.win_state
+    def is_agent_win(self):
+        return self.agent.pos[0] == self.win_state[0] and self.agent.pos[1] == self.win_state[1]
 
-    def is_lose(self):
-        return self.agent.pos in self.holes
+    def is_agent_lose(self):
+        for hole in self.holes:
+            if self.agent.pos[0] == hole[0] and self.agent.pos[1] == hole[1]:
+                return True
+        return False
 
     def get_state_index(self):
         return self.cols * self.agent.pos[0] + self.agent.pos[1]
@@ -62,4 +65,5 @@ class GridEnvironment(Environment):
         if nxtState[0] >= 0 and nxtState[0] <= self.rows-1 and nxtState[1] >= 0 and nxtState[1] <= self.cols-1:
             return nxtState
         return self.agent.pos
+
 
