@@ -33,6 +33,7 @@ class GridEnvironment(Environment):
         self.holes = holes
         self.size = rows * cols
         self.shape = (rows, cols)
+        self.grid = np.zeros(self.shape,dtype='float32')
 
     def reward(self):
         if self.agent.pos == self.win_state:
@@ -50,6 +51,7 @@ class GridEnvironment(Environment):
                 return True
         return False
 
+    
     def get_state_index(self):
         return self.cols * self.agent.pos[0] + self.agent.pos[1]
 
@@ -65,5 +67,33 @@ class GridEnvironment(Environment):
         if nxtState[0] >= 0 and nxtState[0] <= self.rows-1 and nxtState[1] >= 0 and nxtState[1] <= self.cols-1:
             return nxtState
         return self.agent.pos
+    
+    def visit(self, cell):
+        self.grid[cell[0], cell[1]] += 1
 
-
+    def print_path_as_heatmap(self, value_function, iters):
+        data = np.ones(self.shape) * 150
+        for hole in self.holes:
+            data[hole[0], hole[1]] = 255
+        self.agent.pos = self.start
+        i=0
+        while i<self.size:
+            i+=1
+            agent_pos = self.agent.pos
+            data[agent_pos[0], agent_pos[1]] = 50
+            if self.is_agent_win():
+                break
+            old_state = self.get_state_index()
+            action_idx = value_function(old_state)
+            self.agent.pos = self.next_state(self.agent.actions[action_idx])
+        # The Environment
+        # hm = sn.heatmap(data=self.data, linewidths=1,
+        #                 linecolor="black", cmap='Blues', cbar=False)
+        
+        # What The Most Cells The Agent Visited
+        max_ = np.max(self.grid)
+        self.grid[self.start[0], self.start[1]] = max_
+        
+        hm = sn.heatmap(data=self.grid/iters, linewidths=0,
+                        linecolor="black", cmap='Blues', cbar=False, annot=True)
+        plt.show()
