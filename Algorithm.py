@@ -30,7 +30,7 @@ class RLAlgorithm(ABC):
 
 
 class Qlearning(RLAlgorithm):
-    def __init__(self, env, total_episodes=100, lr=0.5, max_steps=25, gamma=0.9, epsilon=0.9, decay=0.99, min_epsilon=0):
+    def __init__(self, env, total_episodes=500, lr=0.5, max_steps=25, gamma=0.9, epsilon=0.9, decay=0.99, min_epsilon=0):
         super().__init__(env, total_episodes, lr, gamma, epsilon, decay, min_epsilon)
         self.q_table = np.zeros((self.env.size, self.env.agent.n_actions))
         self.rewards = []
@@ -88,4 +88,9 @@ class Qlearning(RLAlgorithm):
         # plt.plot(np.arange(self.total_episodes), self.rewards, color='blue')
         plt.xlabel('Episodes')
         plt.ylabel('Total Reward per Epidode')
-        plt.show()
+        # plt.show()
+
+class SARSA(Qlearning):
+    def Q_next(self, state: int):
+        action_idx = self.policy(state)
+        return self.q_table[state,action_idx]
