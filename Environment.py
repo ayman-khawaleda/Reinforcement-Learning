@@ -71,28 +71,31 @@ class GridEnvironment(Environment):
     def visit(self, cell):
         self.grid[cell[0], cell[1]] += 1
 
-    def print_path_as_heatmap(self, value_function, iters):
+    def plot_env(self):
+        plt.figure(figsize=(6,4))
         data = np.ones(self.shape) * 150
         for hole in self.holes:
-            data[hole[0], hole[1]] = 255
+            data[hole[0],hole[1]] = 255
+        data[self.start[0],self.start[1]] = 0
+        data[self.win_state[0],self.win_state[1]]=0
+        # Plot The Environment
+        hm = sn.heatmap(data=data, linewidths=2,
+                        linecolor="black", cmap='Blues', cbar=False)
+
+    def plot_path_as_heatmap(self, value_function, iters, title):
+        plt.figure(figsize=(6,4))
         self.agent.pos = self.start
-        i=0
-        while i<self.size:
-            i+=1
+        while range(self.size):
             agent_pos = self.agent.pos
-            data[agent_pos[0], agent_pos[1]] = 50
             if self.is_agent_win():
                 break
             old_state = self.get_state_index()
             action_idx = value_function(old_state)
             self.agent.pos = self.next_state(self.agent.actions[action_idx])
-        # The Environment
-        # hm = sn.heatmap(data=data, linewidths=1,
-        #                 linecolor="black", cmap='Blues', cbar=False)
         
         # What The Most Cells The Agent Visited
         self.grid[self.start[0], self.start[1]] = iters
         
         hm = sn.heatmap(data=self.grid/iters, linewidths=0,
                         linecolor="black", cmap='Blues', cbar=False, annot=True)
-        plt.show()
+        plt.title(title)
