@@ -15,6 +15,7 @@ class RLAlgorithm(ABC):
         self.epsilon = epsilon
         self.decay = decay
         self.min_epsilon = min_epsilon
+        self.algorithm_name = ""
 
     @abstractmethod
     def fit(self, *args, **kwargs):
@@ -35,6 +36,7 @@ class Qlearning(RLAlgorithm):
         self.q_table = np.zeros((self.env.size, self.env.agent.n_actions))
         self.rewards = []
         self.max_steps = max_steps
+        self.algorithm_name = "Q-learning"
 
     def print_q_table(self):
         print("------------------- Q LEARNING TABLE ------------------\n",
@@ -69,10 +71,8 @@ class Qlearning(RLAlgorithm):
                     new_state_idx) - self.q_table[old_state_idx, action_idx])
 
                 # End The Episode If The Agent Win Or Lose
-                if self.env.is_agent_win():
+                if self.env.is_agent_win() or self.env.is_agent_lose():
                     self.env.visit(self.env.agent.pos)
-                    break
-                if self.env.is_agent_lose():
                     break
                 self.env.visit(self.env.agent.pos)
                 self.total_iters += 1
@@ -86,16 +86,22 @@ class Qlearning(RLAlgorithm):
     def value_function(self, state: int):
         return np.argmax(self.q_table[state, :])
 
-    def plot_reward(self):
+    def plot_reward(self,step=5,color="blue"):
         plt.figure(figsize=(6, 4))
-        plt.plot(np.arange(0, self.total_episodes, 5), [
-                 x for i, x in enumerate(self.rewards) if i % 5 == 0], color='blue')
-        # plt.plot(np.arange(self.total_episodes), self.rewards, color='blue')
+        plt.title(self.algorithm_name)
+        # Plot The Pair Of (Reward, Episodes) Each Step
+        plt.plot(np.arange(0, self.total_episodes, step), [
+                 x for i, x in enumerate(self.rewards) if i % step == 0], color=color)
         plt.xlabel('Episodes')
         plt.ylabel('Total Reward per Epidode')
-        # plt.show()
+        plt.xticks([]),plt.yticks([])
 
 class SARSA(Qlearning):
+    def __init__(self, env, total_episodes=500, lr=0.5, max_steps=25, gamma=0.9, epsilon=0.9, decay=0.99, min_epsilon=0):
+        super().__init__(env, total_episodes, lr, max_steps, gamma, epsilon, decay, min_epsilon)
+        self.algorithm_name = "SARSA"
+    
     def Q_next(self, state: int):
         action_idx = self.policy(state)
         return self.q_table[state,action_idx]
+    
