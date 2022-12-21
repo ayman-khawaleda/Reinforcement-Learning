@@ -1,6 +1,7 @@
-from Algorithm import SARSA, Qlearning
-from Environment import GridEnvironment
-from Agent import GridAgent
+from Algorithms.Algorithm import SARSA, Qlearning
+from Environments.Environment import GridEnvironment
+from Agents.Agent import GridAgent
+
 import matplotlib.pyplot as plt
 if __name__ == "__main__":
     agent = GridAgent()
