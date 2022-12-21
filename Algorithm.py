@@ -94,7 +94,6 @@ class Qlearning(RLAlgorithm):
                  x for i, x in enumerate(self.rewards) if i % step == 0], color=color)
         plt.xlabel('Episodes')
         plt.ylabel('Total Reward per Epidode')
-        plt.xticks([]),plt.yticks([])
 
 class SARSA(Qlearning):
     def __init__(self, env, total_episodes=500, lr=0.5, max_steps=25, gamma=0.9, epsilon=0.9, decay=0.99, min_epsilon=0):
