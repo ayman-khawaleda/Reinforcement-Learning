@@ -1,31 +1,28 @@
-from Agent import Agent,GridAgent
-from abc import ABC,abstractmethod
+from Agent import Agent, GridAgent
+from abc import ABC, abstractmethod
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sn
 
-class Environment:
-    def __init__(self, agent: Agent, reward_values:list) -> None:
+
+class Environment(ABC):
+    def __init__(self, agent: Agent, reward_values: list) -> None:
         self.agent = agent
         self.reward_values = reward_values
-    
+
     @abstractmethod
     def reward(self):
         pass
-    
-    @abstractmethod
-    def get_next_state(self):
-        pass
-    
+
     @abstractmethod
     def next_state(self):
         pass
-    
+
 
 class GridEnvironment(Environment):
 
     def __init__(self, agent: GridAgent, reward_values=[10, -10, -1], rows=4, cols=4, win_state=(3, 3), start_state=(0, 0), holes=[(1, 0), (1, 3), (3, 1), (3, 2)]) -> None:
-        super().__init__(agent,reward_values)
+        super().__init__(agent, reward_values)
         self.rows = rows
         self.cols = cols
         self.win_state = win_state
@@ -33,7 +30,18 @@ class GridEnvironment(Environment):
         self.holes = holes
         self.size = rows * cols
         self.shape = (rows, cols)
-        self.grid = np.zeros(self.shape,dtype='float32')
+        self.grid = np.zeros(self.shape, dtype='float32')
+
+    def random_holes(self, number=5):
+        self.holes = []
+        np.random.seed(None)
+        obstacles_rows = np.random.randint(0, self.rows, number)
+        obstacles_cols = np.random.randint(0, self.cols, number)
+        for obstacle in zip(obstacles_rows, obstacles_cols):
+            if obstacle in [self.win_state, self.start]:
+                continue
+            self.holes.append(obstacle)
+        np.random.seed(15)
 
     def reward(self):
         if self.agent.pos == self.win_state:
@@ -51,7 +59,6 @@ class GridEnvironment(Environment):
                 return True
         return False
 
-    
     def get_state_index(self):
         return self.cols * self.agent.pos[0] + self.agent.pos[1]
 
@@ -67,23 +74,23 @@ class GridEnvironment(Environment):
         if nxtState[0] >= 0 and nxtState[0] <= self.rows-1 and nxtState[1] >= 0 and nxtState[1] <= self.cols-1:
             return nxtState
         return self.agent.pos
-    
+
     def visit(self, cell):
         self.grid[cell[0], cell[1]] += 1
 
     def plot_env(self):
-        plt.figure(figsize=(6,4))
+        plt.figure(figsize=(6, 4))
         data = np.ones(self.shape) * 150
         for hole in self.holes:
-            data[hole[0],hole[1]] = 255
-        data[self.start[0],self.start[1]] = 0
-        data[self.win_state[0],self.win_state[1]]=0
+            data[hole[0], hole[1]] = 255
+        data[self.start[0], self.start[1]] = 0
+        data[self.win_state[0], self.win_state[1]] = 0
         # Plot The Environment
         hm = sn.heatmap(data=data, linewidths=2,
                         linecolor="black", cmap='Blues', cbar=False)
 
-    def plot_path_as_heatmap(self, value_function, iters, title):
-        plt.figure(figsize=(6,4))
+    def plot_path_as_heatmap(self, value_function, iters, title, show_values=True):
+        plt.figure(figsize=(6, 4))
         self.agent.pos = self.start
         while range(self.size):
             agent_pos = self.agent.pos
@@ -92,10 +99,10 @@ class GridEnvironment(Environment):
             old_state = self.get_state_index()
             action_idx = value_function(old_state)
             self.agent.pos = self.next_state(self.agent.actions[action_idx])
-        
+
         # What The Most Cells The Agent Visited
-        self.grid[self.start[0], self.start[1]] = iters
-        
+        self.grid[self.start[0], self.start[1]] = iters/16
+
         hm = sn.heatmap(data=self.grid/iters, linewidths=0,
-                        linecolor="black", cmap='Blues', cbar=False, annot=True)
+                        linecolor="black", cmap='Blues', cbar=False, annot=show_values)
         plt.title(title)
