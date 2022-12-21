@@ -1,9 +1,11 @@
 from Algorithms import Sarasa, Qlearning
 from Environments.GridEnvironment import GridEnvironment
 from Agents.GridAgent import GridAgent
-
+from config import set_numpy_seed
 import matplotlib.pyplot as plt
+
 if __name__ == "__main__":
+    set_numpy_seed(seed=15)
     agent = GridAgent()
     env = GridEnvironment(agent,rows=6,cols=6,win_state=(5,5))
     env.random_holes(10)
