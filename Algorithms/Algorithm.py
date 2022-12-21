@@ -1,6 +1,6 @@
 from abc import abstractmethod, ABC
 import numpy as np
-from Environment import GridEnvironment, Environment
+from Environemnts.Environment import GridEnvironment, Environment
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 
@@ -103,4 +103,17 @@ class SARSA(Qlearning):
     def Q_next(self, state: int):
         action_idx = self.policy(state)
         return self.q_table[state,action_idx]
+
+class DQN(RLAlgorithm):
+    def __init__(self, env: Environment, total_episodes=10000, lr=0.5, gamma=0.9, epsilon=0.9, decay=0.99, min_epsilon=0.1):
+        super().__init__(env, total_episodes, lr, gamma, epsilon, decay, min_epsilon)
+        self.algorithm_name = "DQN"
     
+    def fit(self, *args, **kwargs):
+        return super().fit(*args, **kwargs)
+    
+    def policy(self, *args, **kwargs):
+        return super().policy(*args, **kwargs)
+    
+    def value_function(self, state: int, *args, **kwargs):
+        return super().value_function(state, *args, **kwargs)
