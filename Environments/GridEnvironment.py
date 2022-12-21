@@ -1,5 +1,5 @@
 from .Environment import Environment
-from Agents.Agent import GridAgent
+from Agents.GridAgent import GridAgent
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sn
