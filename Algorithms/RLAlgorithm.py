@@ -1,8 +1,6 @@
 from abc import abstractmethod, ABC
 import numpy as np
-from Environments.Environment import GridEnvironment, Environment
-from tqdm import tqdm
-import matplotlib.pyplot as plt
+from Environments.Environment import Environment
 
 np.random.seed(15)
 
