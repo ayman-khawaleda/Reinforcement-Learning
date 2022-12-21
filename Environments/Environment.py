@@ -1,4 +1,4 @@
-from Agent import Agent, GridAgent
+from Agents.Agent import Agent, GridAgent
 from abc import ABC, abstractmethod
 import numpy as np
 import matplotlib.pyplot as plt
