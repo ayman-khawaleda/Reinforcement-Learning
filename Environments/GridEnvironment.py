@@ -3,6 +3,7 @@ from Agents.GridAgent import GridAgent
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sn
+from config import set_numpy_seed
 class GridEnvironment(Environment):
 
     def __init__(self, agent: GridAgent, reward_values=[10, -10, -1], rows=4, cols=4, win_state=(3, 3), start_state=(0, 0), holes=[(1, 0), (1, 3), (3, 1), (3, 2)]) -> None:
@@ -18,14 +19,14 @@ class GridEnvironment(Environment):
 
     def random_holes(self, number=5):
         self.holes = []
-        np.random.seed(None)
+        set_numpy_seed(seed=None)
         obstacles_rows = np.random.randint(0, self.rows, number)
         obstacles_cols = np.random.randint(0, self.cols, number)
         for obstacle in zip(obstacles_rows, obstacles_cols):
             if obstacle in [self.win_state, self.start]:
                 continue
             self.holes.append(obstacle)
-        np.random.seed(15)
+        set_numpy_seed(seed=15)
 
     def reward(self):
         if self.agent.pos == self.win_state:
