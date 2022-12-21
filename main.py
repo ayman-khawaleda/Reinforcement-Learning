@@ -1,6 +1,6 @@
-from Algorithms.Algorithm import SARSA, Qlearning
-from Environments.Environment import GridEnvironment
-from Agents.Agent import GridAgent
+from Algorithms import Sarasa, Qlearning
+from Environments.GridEnvironment import GridEnvironment
+from Agents.GridAgent import GridAgent
 
 import matplotlib.pyplot as plt
 if __name__ == "__main__":
@@ -9,9 +9,9 @@ if __name__ == "__main__":
     env.random_holes(10)
     env.plot_env()
     
-    q_learning = Qlearning(env, total_episodes=750,max_steps=99)
+    q_learning = Qlearning.Qlearning(env, total_episodes=750,max_steps=99)
     q_learning.fit()
-    sarsa = SARSA(env,total_episodes=750,max_steps=99)
+    sarsa = Sarasa.SARSA(env,total_episodes=750,max_steps=99)
     sarsa.fit()
     
     # q_learning.print_q_table()
