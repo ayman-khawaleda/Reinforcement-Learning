@@ -43,7 +43,10 @@ class GridEnvironment(Environment):
             if self.agent.pos[0] == hole[0] and self.agent.pos[1] == hole[1]:
                 return True
         return False
-
+    
+    def is_agent_done(self):
+        return self.env.is_agent_win() or self.env.is_agent_lose()
+    
     def get_state_index(self):
         return self.cols * self.agent.pos[0] + self.agent.pos[1]
 
