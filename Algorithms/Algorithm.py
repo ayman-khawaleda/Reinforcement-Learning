@@ -1,6 +1,6 @@
 from abc import abstractmethod, ABC
 import numpy as np
-from Environemnts.Environment import GridEnvironment, Environment
+from Environments.Environment import GridEnvironment, Environment
 from tqdm import tqdm
 import matplotlib.pyplot as plt
 
