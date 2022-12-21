@@ -27,7 +27,7 @@ class Qlearning(RLAlgorithm):
         for episodes in tqdm(range(self.total_episodes)):
             self.env.agent.pos = self.env.start
             total_reward = 0
-            for _ in range(self.max_steps):
+            for _ in range(self.max_steps) or self.env.is_agent_done():
                 old_state_idx = self.env.get_state_index()
                 action_idx = self.policy(old_state_idx)
 
@@ -43,10 +43,6 @@ class Qlearning(RLAlgorithm):
                 self.q_table[old_state_idx, action_idx] += self.lr * (reward + self.gamma * self.Q_next(
                     new_state_idx) - self.q_table[old_state_idx, action_idx])
 
-                # End The Episode If The Agent Win Or Lose
-                if self.env.is_agent_win() or self.env.is_agent_lose():
-                    self.env.visit(self.env.agent.pos)
-                    break
                 self.env.visit(self.env.agent.pos)
                 self.total_iters += 1
             # Trade off Exploration & Exploitation
