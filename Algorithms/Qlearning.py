@@ -55,11 +55,4 @@ class Qlearning(RLAlgorithm):
     def value_function(self, state: int):
         return np.argmax(self.q_table[state, :])
 
-    def plot_reward(self, step=5, color="blue"):
-        plt.figure(figsize=(6, 4))
-        plt.title(self.algorithm_name)
-        # Plot The Pair Of (Reward, Episodes) Each Step
-        plt.plot(np.arange(0, self.total_episodes, step), [
-                 x for i, x in enumerate(self.rewards) if i % step == 0], color=color)
-        plt.xlabel('Episodes')
-        plt.ylabel('Total Reward per Epidode')
+
