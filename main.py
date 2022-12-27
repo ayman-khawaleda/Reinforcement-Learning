@@ -11,8 +11,8 @@ if __name__ == "__main__":
     env.random_holes(3)
     env.plot_env()
 
-    dqn = DQN.DQN(env,epochs=50,neurons_num=[12,36],decay=0.97, batch_size=8,lr=0.1)
+    dqn = DQN.DQN(env,epochs=50,neurons_num=[12,36],decay=0.97, batch_size=16,lr=0.1)
     dqn.fit()
     dqn.plot_reward(step=1)
-    env.plot_path_as_heatmap(dqn.value_function,dqn.total_iters,"DQN")
+    # env.plot_path_as_heatmap(dqn.value_function,dqn.total_iters,"DQN")
     plt.show()
