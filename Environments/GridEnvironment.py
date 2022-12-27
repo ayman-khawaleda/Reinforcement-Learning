@@ -33,9 +33,9 @@ class GridEnvironment(Environment):
         set_numpy_seed(seed=15)
 
     def reward(self):
-        if self.agent.pos == self.win_state:
+        if self.is_agent_win():
             return self.reward_values[0]
-        elif self.agent.pos in self.holes:
+        elif self.is_agent_lose():
             return self.reward_values[1]
         return self.reward_values[2]
 
@@ -49,7 +49,7 @@ class GridEnvironment(Environment):
         return False
     
     def is_agent_done(self):
-        return self.env.is_agent_win() or self.env.is_agent_lose()
+        return self.is_agent_win() or self.is_agent_lose()
     
     def get_state_index(self):
         return self.cols * self.agent.pos[0] + self.agent.pos[1]
