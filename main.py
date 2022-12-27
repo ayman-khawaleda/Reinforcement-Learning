@@ -1,4 +1,4 @@
-from Algorithms import Sarasa, Qlearning
+from Algorithms import Sarasa, Qlearning, DQN
 from Environments.GridEnvironment import GridEnvironment
 from Agents.GridAgent import GridAgent
 from config import set_numpy_seed
@@ -7,23 +7,12 @@ import matplotlib.pyplot as plt
 if __name__ == "__main__":
     set_numpy_seed(seed=15)
     agent = GridAgent()
-    env = GridEnvironment(agent,rows=6,cols=6,win_state=(5,5))
-    env.random_holes(10)
+    env = GridEnvironment(agent,reward_values=[200, -10, -1], rows=4, cols=4, win_state=(3, 3))
+    env.random_holes(3)
     env.plot_env()
-    
-    q_learning = Qlearning.Qlearning(env, total_episodes=750,max_steps=99)
-    q_learning.fit()
-    sarsa = Sarasa.SARSA(env,total_episodes=750,max_steps=99)
-    sarsa.fit()
-    
-    # q_learning.print_q_table()
-    # sarsa.print_q_table()
-    q_learning.plot_reward()
-    sarsa.plot_reward()
-    
-    env.plot_path_as_heatmap(q_learning.value_function,
-                             q_learning.total_iters, "Q-learning", show_values=False)
-    env.plot_path_as_heatmap(sarsa.value_function,
-                             sarsa.total_iters, "Sarsa", show_values=False)
-    
+
+    dqn = DQN.DQN(env,epochs=50,neurons_num=[12,36],decay=0.97, batch_size=8,lr=0.1)
+    dqn.fit()
+    dqn.plot_reward(step=1)
+    env.plot_path_as_heatmap(dqn.value_function,dqn.total_iters,"DQN")
     plt.show()
