@@ -16,7 +16,11 @@ class GridEnvironment(Environment):
         self.size = rows * cols
         self.shape = (rows, cols)
         self.grid = np.zeros(self.shape, dtype='float32')
-
+    
+    def reset(self):
+        self.agent.pos = self.start
+        return self.get_state_index()
+    
     def random_holes(self, number=5):
         self.holes = []
         set_numpy_seed(seed=None)
