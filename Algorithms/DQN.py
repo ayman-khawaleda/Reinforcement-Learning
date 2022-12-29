@@ -13,14 +13,14 @@ from keras.optimizers import Adam
 
 
 class DQN(RLAlgorithm):
-    def __init__(self, env, epochs=100, max_steps=99,neurons_num:list = [12,24], lr=0.5, gamma=0.99, epsilon=0.99, decay=0.999, min_epsilon=0.01, batch_size=32):
+    def __init__(self, env, epochs=100, max_steps=99,neurons_num:list = [12,24], lr=0.5, gamma=0.99, epsilon=0.99, decay=0.999, min_epsilon=0.01, batch_size=32,max_len_queue=1000):
         super().__init__(env, epochs, lr, gamma, epsilon, decay, min_epsilon)
         self.algorithm_name = "DQN"
         self.max_steps = max_steps
         self.rewards = []
         self.EPOCHS = epochs
         self.batch_size = batch_size
-        self.memory = deque(maxlen=100000)
+        self.memory = deque(max_len_queue)
         self.neurons_num_list = neurons_num
         self.model = self.create_model()
         self.model.summary()
@@ -29,7 +29,7 @@ class DQN(RLAlgorithm):
         model = Sequential()
         model.add(Input(self.env.size))
         for n in self.neurons_num_list:
-            model.add(Dense(n, activation="tanh"))
+            model.add(Dense(n, activation="relu"))
 
         model.add(Dense(self.env.agent.n_actions,
                        activation='linear', name="Actions"))
