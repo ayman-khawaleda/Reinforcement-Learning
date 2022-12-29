@@ -84,7 +84,7 @@ class GridEnvironment(Environment):
     def plot_path_as_heatmap(self, value_function, iters, title, show_values=True):
         plt.figure(figsize=(6, 4))
         self.agent.pos = self.start
-        while range(self.size):
+        for i in range(self.size):
             agent_pos = self.agent.pos
             if self.is_agent_win():
                 break
