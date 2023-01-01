@@ -66,11 +66,9 @@ class DQN(RLAlgorithm):
     def fit(self, *args, **kwargs):
         self.total_iters = 0
         total_reward = 0
-        wins = 0
         for e in tqdm(range(self.EPOCHS)):
             state_idx = self.env.reset()
             done = self.env.is_agent_done()
-            rw1 =0
             for step in range(self.max_steps):
                 action_idx = self.policy(state_idx)
                 self.env.agent.pos = self.env.next_state(
@@ -84,7 +82,6 @@ class DQN(RLAlgorithm):
                 state_idx = new_state_idx
                 
                 total_reward += reward
-                rw1 += reward
                 self.total_iters += 1
                 if done:
                     break
