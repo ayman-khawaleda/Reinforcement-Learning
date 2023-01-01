@@ -20,7 +20,7 @@ class DQN(RLAlgorithm):
         self.rewards = []
         self.EPOCHS = epochs
         self.batch_size = batch_size
-        self.memory = deque(max_len_queue)
+        self.memory = deque(maxlen=max_len_queue)
         self.neurons_num_list = neurons_num
         self.model = self.create_model()
         self.model.summary()
