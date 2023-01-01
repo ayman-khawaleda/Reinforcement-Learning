@@ -6,7 +6,10 @@ from collections import deque
 import random
 import numpy as np
 import matplotlib.pyplot as plt
+import os
 from tqdm import tqdm
+from keras.models import load_model as __ldm
+from keras.models import save_model as __sdm
 from keras.models import Sequential
 from keras.layers import Dense, Input
 from keras.optimizers import Adam
@@ -107,3 +110,38 @@ class DQN(RLAlgorithm):
 
     def value_function(self, state: int, *args, **kwargs):
         return np.argmax(self.pred(state))
+
+    def save(self, path=".",file_name=None, *args):
+        if os.path.isdir(path):
+            if not path.endswith("rl_models"):
+                models_path = os.path.join(path, "rl_models")
+                if not os.path.isdir(models_path):
+                    os.mkdir(models_path)
+            else:
+                models_path = path
+            if file_name:
+                self.model.save_weights(os.path.join(models_path,file_name),*args)
+            else:
+                self.model.save_weights(os.path.join(models_path,"DQN"),*args)
+        self.model.save_weights(path,*args)
+    
+    
+    def save_model(self,path=".", file_name=None, *args):
+        if os.path.isdir(path):
+            if not path.endswith("rl_models"):
+                models_path = os.path.join(path,"rl_models")
+                if not os.path.isdir(models_path):
+                    os.mkdir(models_path)
+            else:
+                models_path = path
+            if file_name:
+                __sdm(self.model, os.path.join(models_path,file_name),*args)
+            else:
+                __sdm(self.model, os.path.join(models_path,"DQN.h5"),*args)
+        __sdm(self.model, path, *args)
+    
+    def load(self, path, *args):
+        self.model.load_weights(path,*args)
+    
+    def load_model(self, path, *args):
+        self.model = __ldm(path, *args)
