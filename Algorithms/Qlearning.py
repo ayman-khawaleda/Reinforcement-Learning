@@ -1,7 +1,11 @@
+from ntpath import join
 from .RLAlgorithm import RLAlgorithm
 import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
+import pickle as pkl
+import os
+
 
 class Qlearning(RLAlgorithm):
     def __init__(self, env, total_episodes=500, lr=0.5, max_steps=25, gamma=0.9, epsilon=0.9, decay=0.99, min_epsilon=0):
@@ -55,4 +59,25 @@ class Qlearning(RLAlgorithm):
     def value_function(self, state: int):
         return np.argmax(self.q_table[state, :])
 
-
+    def save(self, path=".", file_name=None):
+        if os.path.isdir(path):
+            if not path.endswith("rl_models"):
+                models_path = os.path.join(path, "rl_models")
+                if not os.path.isdir(models_path):
+                    os.mkdir(models_path)
+            else:
+                models_path = path
+            if file_name[:-3] != "npy":
+                raise ValueError("File name should end with .npy")
+            path = os.path.join(models_path, file_name) if file_name else os.path.join(
+                models_path, "Q_learning_table.npy")
+            np.save(path, self.q_table)
+            return True
+        else:
+            raise ValueError("Provide valid directory")
+        
+    def load(self, path):
+        if path[:-3] != "npy":
+            raise ValueError("Path should end with .npy")
+        self.q_table = np.load(path, self.q_table)
+        return True
