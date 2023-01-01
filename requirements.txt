@@ -7,8 +7,11 @@ cachetools==5.2.0
 certifi==2022.12.7
 charset-normalizer==2.1.1
 cloudpickle==2.2.0
+comm==0.1.2
 cycler==0.11.0
+debugpy==1.6.4
 decorator==5.1.1
+entrypoints==0.4
 executing==1.2.0
 flatbuffers==1.12
 fonttools==4.38.0
@@ -21,8 +24,11 @@ gym==0.26.0
 gym-notices==0.0.8
 h5py==3.7.0
 idna==3.4
+ipykernel==6.19.4
 ipython==8.7.0
 jedi==0.18.2
+jupyter_client==7.4.8
+jupyter_core==5.1.1
 keras==2.9.0
 Keras-Preprocessing==1.1.2
 kiwisolver==1.4.4
@@ -31,6 +37,7 @@ Markdown==3.4.1
 MarkupSafe==2.1.1
 matplotlib==3.5.2
 matplotlib-inline==0.1.6
+nest-asyncio==1.5.6
 numpy==1.23.5
 oauthlib==3.2.2
 opt-einsum==3.3.0
@@ -40,9 +47,11 @@ parso==0.8.3
 pexpect==4.8.0
 pickleshare==0.7.5
 Pillow==9.3.0
+platformdirs==2.6.2
 plotly==5.8.2
 prompt-toolkit==3.0.36
 protobuf==3.19.6
+psutil==5.9.4
 ptyprocess==0.7.0
 pure-eval==0.2.2
 pyasn1==0.4.8
@@ -52,6 +61,7 @@ Pygments==2.13.0
 pyparsing==3.0.9
 python-dateutil==2.8.2
 pytz==2022.7
+pyzmq==24.0.1
 requests==2.28.1
 requests-oauthlib==1.3.1
 rsa==4.9
@@ -68,6 +78,7 @@ tensorflow-estimator==2.9.0
 tensorflow-io-gcs-filesystem==0.28.0
 termcolor==2.1.1
 tomli==2.0.1
+tornado==6.2
 tqdm==4.64.1
 traitlets==5.7.1
 typing_extensions==4.4.0
