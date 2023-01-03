@@ -85,7 +85,6 @@ class GridEnvironment(Environment):
         plt.figure(figsize=(6, 4))
         self.agent.pos = self.start
         for i in range(self.size):
-            agent_pos = self.agent.pos
             if self.is_agent_win():
                 break
             old_state = self.get_state_index()
