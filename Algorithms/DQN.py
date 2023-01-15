@@ -8,8 +8,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 import os
 from tqdm import tqdm
-from keras.models import load_model as __ldm
-from keras.models import save_model as __sdm
+from keras.models import load_model as ldm
+from keras.models import save_model as sdm
 from keras.models import Sequential
 from keras.layers import Dense, Input
 from keras.optimizers import Adam
@@ -80,7 +80,8 @@ class DQN(RLAlgorithm):
                 self.remember(state_idx, action_idx,
                               reward, new_state_idx, done)
                 state_idx = new_state_idx
-                
+                self.env.visit(self.env.agent.pos)
+
                 total_reward += reward
                 self.total_iters += 1
                 if done:
@@ -132,13 +133,13 @@ class DQN(RLAlgorithm):
             else:
                 models_path = path
             if file_name:
-                __sdm(self.model, os.path.join(models_path,file_name),*args)
+                sdm(self.model, os.path.join(models_path,file_name),*args)
             else:
-                __sdm(self.model, os.path.join(models_path,"DQN.h5"),*args)
-        __sdm(self.model, path, *args)
+                sdm(self.model, os.path.join(models_path,"DQN.h5"),*args)
+        sdm(self.model, path, *args)
     
     def load(self, path, *args):
         self.model.load_weights(path,*args)
     
     def load_model(self, path, *args):
-        self.model = __ldm(path, *args)
+        self.model = ldm(path, *args)
