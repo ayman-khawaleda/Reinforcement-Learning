@@ -1,10 +1,12 @@
-from ntpath import join
+import time
 from .RLAlgorithm import RLAlgorithm
 import numpy as np
 import matplotlib.pyplot as plt
 from tqdm import tqdm
-import pickle as pkl
 import os
+import seaborn as sns
+
+from matplotlib import animation
 
 
 class Qlearning(RLAlgorithm):
@@ -13,7 +15,9 @@ class Qlearning(RLAlgorithm):
         self.q_table = np.zeros((self.env.size, self.env.agent.n_actions))
         self.rewards = []
         self.max_steps = max_steps
+        self.q_table_snapshots = []
         self.algorithm_name = "Q-learning"
+        self.fig = plt.figure()
 
     def print_q_table(self):
         print("------------------- Q LEARNING TABLE ------------------\n",
@@ -49,6 +53,7 @@ class Qlearning(RLAlgorithm):
 
                 self.env.visit(self.env.agent.pos)
                 self.total_iters += 1
+            self.q_table_snapshots.append(self.q_table.copy())
             # Trade off Exploration & Exploitation
             self.epsilon = max(self.epsilon * self.decay, self.min_epsilon)
             self.rewards.append(total_reward)
@@ -75,9 +80,23 @@ class Qlearning(RLAlgorithm):
             return True
         else:
             raise ValueError("Provide valid directory")
-        
+
     def load(self, path):
         if path[:-3] != "npy":
             raise ValueError("Path should end with .npy")
         self.q_table = np.load(path, self.q_table)
         return True
+
+    def init(self):
+        sns.heatmap(np.zeros((10, 10)), vmax=.8, square=True, cbar=False)
+
+    def gen(self):
+        for snap_shot in self.q_table_snapshots:
+            yield snap_shot
+
+    def animate(self, i):
+        sns.heatmap(i, square=True, cbar=False, annot=False)
+
+    def animate_q_table_changes(self):
+        self.anim = animation.FuncAnimation(
+            self.fig, self.animate, self.gen, init_func=self.init)
