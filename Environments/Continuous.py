@@ -13,11 +13,11 @@ class PendulumEnvironment(Environment):
         self.done=False
     
     def reward(self):
-        return self.reward
+        return self.reward_
     
     def next_state(self,action):
-        self.state, self.reward, self.done, self.info = self.env.step(action)
-        return self.state
+        self.state, self.reward_, self.done, self.info = self.env.step(action)
+        return self.state, self.reward_
     
     def is_done(self):
         self.done
