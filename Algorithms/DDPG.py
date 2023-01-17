@@ -31,8 +31,8 @@ class DDPG(RLAlgorithm):
         self.__target_critic = self.__get_critic()
         self.__target_actor.set_weights(self.__actor_model.get_weights())
         self.__target_critic.set_weights(self.__critic_model.get_weights())
-        self.critic_optimizer = tf.keras.optimizers.Adam(self.critical_lr)
-        self.actor_optimizer = tf.keras.optimizers.Adam(self.actor_lr)
+        self.__critic_optimizer = tf.keras.optimizers.Adam(self.critical_lr)
+        self.__actor_optimizer = tf.keras.optimizers.Adam(self.actor_lr)
 
     def __get_actor(self):
         init = tf.random_uniform_initializer(minval=-0.003, maxval=0.003)
