@@ -1,6 +1,6 @@
-from RLAlgorithm import RLAlgorithm
-from Utils.Noise import OUNoise
-from Utils.Buffer import Buffer
+from .RLAlgorithm import RLAlgorithm
+from .Utils.Noise import OUNoise
+from .Utils.Buffer import Buffer
 from keras import layers
 from keras.models import load_model as ldm
 from keras.models import save_model as sdm
@@ -8,6 +8,7 @@ import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
 import os
+from tqdm import tqdm
 
 
 class DDPG(RLAlgorithm):
@@ -36,7 +37,7 @@ class DDPG(RLAlgorithm):
 
     def __get_actor(self):
         init = tf.random_uniform_initializer(minval=-0.003, maxval=0.003)
-        inputs = layers.Input(shape=(self.num_states,))
+        inputs = layers.Input(shape=(self.env.num_states,))
         d = layers.Dense(128, activation="relu")(inputs)
         d = layers.Dense(256, activation="relu")(d)
         d = layers.Dense(384, activation="relu")(d)
@@ -52,7 +53,7 @@ class DDPG(RLAlgorithm):
         state_out = layers.Dense(16, activation="relu")(state_input)
         state_out = layers.Dense(32, activation="relu")(state_out)
 
-        action_input = layers.Input(shape=(self.num_actions))
+        action_input = layers.Input(shape=(self.env.num_actions))
         action_out = layers.Dense(32, activation="relu")(action_input)
 
         concat = layers.Concatenate()([state_out, action_out])
@@ -98,19 +99,51 @@ class DDPG(RLAlgorithm):
 
     def policy(self, state, *args, **kwargs):
         sampled_actions = tf.squeeze(self.__actor_model(state))
-        noise = self.ou_noise()
-        sampled_actions = sampled_actions.numpy() + noise
+        sampled_actions = sampled_actions.numpy() + self.ou_noise()
         legal_action = np.clip(
             sampled_actions, self.env.lower_bound, self.env.upper_bound)
         return [np.squeeze(legal_action)]
 
     @tf.function
-    def update_target(self, target_weights, weights):
-        for (a, b) in zip(target_weights, weights):
+    def update_target_weights(self):
+        for (a, b) in zip(self.__target_actor.variables, self.__actor_model.variables):
+            a.assign(self.tau * b + (1 - self.tau) * a)
+        for (a, b) in zip(self.__target_critic.variables, self.__critic_model.variables):
             a.assign(self.tau * b + (1 - self.tau) * a)
 
     def fit(self, *args, **kwargs):
-        return super().fit(*args, **kwargs)
+        render = render_ if (render_ := kwargs['render']) else False
+        ep_reward_list = []
+        self.avg_reward_list = []
+        for ep in tqdm(range(self.total_episodes)):
+            prev_state = self.env.reset()
+            episodic_reward = 0
+            done = False
+            while not done:
+                if render:
+                    self.env.render()
+                tf_prev_state = tf.expand_dims(tf.convert_to_tensor(prev_state), 0)
+                action = self.policy(tf_prev_state)
+                state, reward = self.env.next_state(action)
+
+                self.memory.remember((prev_state, action, reward, state))
+                episodic_reward += reward
+
+                self.replay()
+                self.update_target_weights()
+                prev_state = state
+
+            ep_reward_list.append(episodic_reward)
+            avg_reward = np.mean(ep_reward_list[-10:])
+            self.avg_reward_list.append(avg_reward)
+            self.env.close()
+    
+    def plot_reward(self, step=None, color="blue"):
+        plt.figure(figsize=(6, 4))
+        plt.title(self.algorithm_name)
+        plt.plot(self.avg_reward_list, color=color)
+        plt.xlabel("Episode")
+        plt.ylabel("Avg. Epsiodic Reward")
 
     def save(self, path=".", file_name=None, *args):
         if os.path.isdir(path):
