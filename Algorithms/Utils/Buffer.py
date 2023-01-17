@@ -2,14 +2,17 @@ import numpy as np
 import tensorflow as tf
 
 class Buffer:
-    def __init__(self, buffer_capacity) -> None:
+    def __init__(self, buffer_capacity, num_states, num_actions, batch_size) -> None:
         self.buffer_capacity = buffer_capacity
+        self.num_states = num_states
+        self.num_actions = num_actions
         self.buffer_counter = 0
+        self.batch_size = batch_size
 
-        self.state_buffer = np.zeros((self.buffer_capacity, self.env.num_states))
-        self.action_buffer = np.zeros((self.buffer_capacity, self.env.num_actions))
+        self.state_buffer = np.zeros((self.buffer_capacity, self.num_states))
+        self.action_buffer = np.zeros((self.buffer_capacity, self.num_actions))
         self.reward_buffer = np.zeros((self.buffer_capacity, 1))
-        self.next_state_buffer = np.zeros((self.buffer_capacity, self.env.num_states))
+        self.next_state_buffer = np.zeros((self.buffer_capacity, self.num_states))
 
     def remember(self, obs_tuple):
         index = self.buffer_counter % self.buffer_capacity
