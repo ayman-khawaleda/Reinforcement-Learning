@@ -26,7 +26,7 @@ class DQN(RLAlgorithm):
         self.memory = deque(maxlen=max_len_queue)
         self.neurons_num_list = neurons_num
         self.model = self.create_model()
-        self.model.summary()
+        # self.model.summary()
 
     def create_model(self):
         model = Sequential()
