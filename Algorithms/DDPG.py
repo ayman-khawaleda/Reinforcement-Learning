@@ -1,10 +1,13 @@
 from RLAlgorithm import RLAlgorithm
 from Utils.Noise import OUNoise
 from Utils.Buffer import Buffer
+from keras import layers
+from keras.models import load_model as ldm
+from keras.models import save_model as sdm
 import numpy as np
 import tensorflow as tf
-from keras import layers
 import matplotlib.pyplot as plt
+import os
 
 
 class DDPG(RLAlgorithm):
@@ -23,11 +26,41 @@ class DDPG(RLAlgorithm):
     def fit(self, *args, **kwargs):
         return super().fit(*args, **kwargs)
 
-    def save(self, path=".", file_name=None):
-        return None
+    def save(self, path=".", file_name=None, *args):
+        if os.path.isdir(path):
+            if not path.endswith("rl_models"):
+                models_path = os.path.join(path, "rl_models")
+                if not os.path.isdir(models_path):
+                    os.mkdir(models_path)
+            else:
+                models_path = path
+            if file_name:
+                self.model.save_weights(os.path.join(
+                    models_path, file_name), *args)
+            else:
+                self.model.save_weights(
+                    os.path.join(models_path, "DDPG"), *args)
+        self.model.save_weights(path, *args)
 
-    def load(self, path):
-        return None
+    def save_model(self, path=".", file_name=None, *args):
+        if os.path.isdir(path):
+            if not path.endswith("rl_models"):
+                models_path = os.path.join(path, "rl_models")
+                if not os.path.isdir(models_path):
+                    os.mkdir(models_path)
+            else:
+                models_path = path
+            if file_name:
+                sdm(self.model, os.path.join(models_path, file_name), *args)
+            else:
+                sdm(self.model, os.path.join(models_path, "DDPG.h5"), *args)
+        sdm(self.model, path, *args)
 
+    def load(self, path, *args):
+        self.model.load_weights(path, *args)
+
+    def load_model(self, path, *args):
+        self.model = ldm(path, *args)
+        
     def value_function(self, state, *args, **kwargs):
-        return None
+        pass
