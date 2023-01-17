@@ -23,6 +23,46 @@ class DDPG(RLAlgorithm):
         self.memory = Buffer(max_len_buffer)
         self.__build_models()
 
+    def __build_models(self):
+        self.__actor_model = self.__get_actor()
+        self.__critic_model = self.__get_critic()
+        self.__target_actor = self.__get_actor()
+        self.__target_critic = self.__get_critic()
+        self.__target_actor.set_weights(self.__actor_model.get_weights())
+        self.__target_critic.set_weights(self.__critic_model.get_weights())
+        self.critic_optimizer = tf.keras.optimizers.Adam(self.critical_lr)
+        self.actor_optimizer = tf.keras.optimizers.Adam(self.actor_lr)
+        
+    def __get_actor(self):
+        init = tf.random_uniform_initializer(minval=-0.003, maxval=0.003)
+        inputs = layers.Input(shape=(self.num_states,))
+        d = layers.Dense(128, activation="relu")(inputs)
+        d = layers.Dense(256, activation="relu")(d)
+        d = layers.Dense(384, activation="relu")(d)
+        outputs = layers.Dense(1, activation="tanh",kernel_initializer=init)(d)
+
+        outputs = outputs * self.env.upper_bound
+        model = tf.keras.Model(inputs, outputs)
+        return model
+
+    def __get_critic(self):
+        state_input = layers.Input(shape=(self.env.num_states))
+        state_out = layers.Dense(16, activation="relu")(state_input)
+        state_out = layers.Dense(32, activation="relu")(state_out)
+
+        action_input = layers.Input(shape=(self.num_actions))
+        action_out = layers.Dense(32, activation="relu")(action_input)
+
+        concat = layers.Concatenate()([state_out, action_out])
+
+        d = layers.Dense(128, activation="relu")(concat)
+        d = layers.Dense(256, activation="relu")(d)
+        d = layers.Dense(384, activation="relu")(d)
+        outputs = layers.Dense(1)(d)
+
+        model = tf.keras.Model([state_input, action_input], outputs)
+        return model
+
     @tf.function
     def replay(self):
         state_batch, action_batch, reward_batch, next_state_batch = self.memory.sample()
@@ -61,7 +101,6 @@ class DDPG(RLAlgorithm):
         legal_action = np.clip(
             sampled_actions, self.env.lower_bound, self.env.upper_bound)
         return [np.squeeze(legal_action)]
-
 
     def fit(self, *args, **kwargs):
         return super().fit(*args, **kwargs)
