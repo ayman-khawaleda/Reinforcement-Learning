@@ -21,3 +21,12 @@ class PendulumEnvironment(Environment):
     
     def is_done(self):
         self.done
+    
+    def reset(self):
+        self.env.reset()
+
+    def close(self):
+        self.env.close()
+    
+    def render(self):
+        self.env.render()
