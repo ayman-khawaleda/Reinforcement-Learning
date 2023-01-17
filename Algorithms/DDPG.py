@@ -23,6 +23,46 @@ class DDPG(RLAlgorithm):
         self.memory = Buffer(max_len_buffer)
         self.__build_models()
 
+    @tf.function
+    def replay(self):
+        state_batch, action_batch, reward_batch, next_state_batch = self.memory.sample()
+        with tf.GradientTape() as tape:
+            target_actions = self.__target_actor(
+                next_state_batch, training=True)
+            y = reward_batch + self.gamma * self.__target_critic(
+                [next_state_batch, target_actions], training=True
+            )
+            critic_value = self.__critic_model(
+                [state_batch, action_batch], training=True)
+            critic_loss = tf.math.reduce_mean(tf.math.square(y - critic_value))
+
+            critic_grad = tape.gradient(
+                critic_loss, self.__critic_model.trainable_variables)
+            self.__critic_optimizer.apply_gradients(
+                zip(critic_grad, self.__critic_model.trainable_variables)
+            )
+
+        with tf.GradientTape() as tape:
+            actions = self.__actor_model(state_batch, training=True)
+            critic_value = self.__critic_model(
+                [state_batch, actions], training=True)
+            actor_loss = -tf.math.reduce_mean(critic_value)
+
+        actor_grad = tape.gradient(
+            actor_loss, self.__actor_model.trainable_variables)
+        self.__actor_optimizer.apply_gradients(
+            zip(actor_grad, self.__actor_model.trainable_variables)
+        )
+
+    def policy(self, state, *args, **kwargs):
+        sampled_actions = tf.squeeze(self.__actor_model(state))
+        noise = self.ou_noise()
+        sampled_actions = sampled_actions.numpy() + noise
+        legal_action = np.clip(
+            sampled_actions, self.env.lower_bound, self.env.upper_bound)
+        return [np.squeeze(legal_action)]
+
+
     def fit(self, *args, **kwargs):
         return super().fit(*args, **kwargs)
 
