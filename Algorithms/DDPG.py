@@ -102,6 +102,12 @@ class DDPG(RLAlgorithm):
             sampled_actions, self.env.lower_bound, self.env.upper_bound)
         return [np.squeeze(legal_action)]
 
+
+    @tf.function
+    def update_target(self,target_weights, weights):
+        for (a, b) in zip(target_weights, weights):
+            a.assign(self.tau * b + (1 - self.tau) * a)
+
     def fit(self, *args, **kwargs):
         return super().fit(*args, **kwargs)
 
