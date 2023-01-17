@@ -20,13 +20,13 @@ class PendulumEnvironment(Environment):
         return self.state, self.reward_
     
     def is_done(self):
-        self.done
+        return self.done
     
     def reset(self):
-        self.env.reset()
+        return self.env.reset()
 
     def close(self):
-        self.env.close()
+        return self.env.close()
     
     def render(self):
-        self.env.render()
+        return self.env.render()
