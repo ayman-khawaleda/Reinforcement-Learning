@@ -17,7 +17,7 @@ class PendulumEnvironment(Environment):
     
     def next_state(self,action):
         self.state, self.reward_, self.done, self.info = self.env.step(action)
-        return self.state, self.reward_
+        return self.state, self.reward_, self.done
     
     def is_done(self):
         return self.done
