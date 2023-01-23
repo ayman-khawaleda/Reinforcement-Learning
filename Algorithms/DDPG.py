@@ -12,7 +12,7 @@ from tqdm import tqdm
 
 
 class DDPG(RLAlgorithm):
-    def __init__(self, env, total_episodes=100, tau=5e-3, actor_lr=2e-3, critic_lr=1e-3, batch_size=32, max_len_buffer=1e4, gamma=0.99, epsilon=0.9, decay=0.99, min_epsilon=0.1, std_noise=0.1):
+    def __init__(self, env, total_episodes=100, tau=5e-3, actor_lr=2e-4, critic_lr=1e-4, batch_size=64, max_len_buffer=5e4, gamma=0.99, epsilon=0.9, decay=0.99, min_epsilon=0.1, std_noise=0.2):
         super().__init__(env, total_episodes, actor_lr, gamma, epsilon, decay, min_epsilon)
         self.algorithm_name = "DDPG"
         self.tau = tau
@@ -38,9 +38,8 @@ class DDPG(RLAlgorithm):
     def __get_actor(self):
         init = tf.random_uniform_initializer(minval=-0.003, maxval=0.003)
         inputs = layers.Input(shape=(self.env.num_states,))
-        d = layers.Dense(128, activation="relu")(inputs)
+        d = layers.Dense(256, activation="relu")(inputs)
         d = layers.Dense(256, activation="relu")(d)
-        d = layers.Dense(384, activation="relu")(d)
         outputs = layers.Dense(1, activation="tanh",
                                kernel_initializer=init)(d)
 
@@ -58,9 +57,8 @@ class DDPG(RLAlgorithm):
 
         concat = layers.Concatenate()([state_out, action_out])
 
-        d = layers.Dense(128, activation="relu")(concat)
+        d = layers.Dense(256, activation="relu")(concat)
         d = layers.Dense(256, activation="relu")(d)
-        d = layers.Dense(384, activation="relu")(d)
         outputs = layers.Dense(1)(d)
 
         model = tf.keras.Model([state_input, action_input], outputs)
@@ -107,9 +105,9 @@ class DDPG(RLAlgorithm):
     @tf.function
     def update_target_weights(self):
         for (a, b) in zip(self.__target_actor.variables, self.__actor_model.variables):
-            a.assign(self.tau * b + (1 - self.tau) * a)
+            a.assign(b * self.tau + a * (1 - self.tau))
         for (a, b) in zip(self.__target_critic.variables, self.__critic_model.variables):
-            a.assign(self.tau * b + (1 - self.tau) * a)
+            a.assign(b * self.tau + a * (1 - self.tau))
 
     def fit(self, *args, **kwargs):
         render = render_ if (render_ := kwargs['render']) else False
@@ -124,7 +122,7 @@ class DDPG(RLAlgorithm):
                     self.env.render()
                 tf_prev_state = tf.expand_dims(tf.convert_to_tensor(prev_state), 0)
                 action = self.policy(tf_prev_state)
-                state, reward = self.env.next_state(action)
+                state, reward, done = self.env.next_state(action)
 
                 self.memory.remember((prev_state, action, reward, state))
                 episodic_reward += reward
@@ -134,7 +132,7 @@ class DDPG(RLAlgorithm):
                 prev_state = state
 
             ep_reward_list.append(episodic_reward)
-            avg_reward = np.mean(ep_reward_list[-10:])
+            avg_reward = np.mean(ep_reward_list[-40:])
             self.avg_reward_list.append(avg_reward)
             self.env.close()
     
