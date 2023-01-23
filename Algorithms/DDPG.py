@@ -12,7 +12,7 @@ from tqdm import tqdm
 
 
 class DDPG(RLAlgorithm):
-    def __init__(self, env, total_episodes=100, tau=5e-3, actor_lr=2e-4, critic_lr=1e-4, batch_size=64, max_len_buffer=5e4, gamma=0.99, epsilon=0.9, decay=0.99, min_epsilon=0.1, std_noise=0.2):
+    def __init__(self, env, total_episodes=100, tau=5e-3, actor_lr=2e-3, critic_lr=1e-3, batch_size=64, max_len_buffer=5e4, gamma=0.99, epsilon=0.9, decay=0.99, min_epsilon=0.1, std_noise=0.2):
         super().__init__(env, total_episodes, actor_lr, gamma, epsilon, decay, min_epsilon)
         self.algorithm_name = "DDPG"
         self.tau = tau
