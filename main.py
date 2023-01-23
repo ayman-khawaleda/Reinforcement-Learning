@@ -5,9 +5,9 @@ from config import set_numpy_seed
 import matplotlib.pyplot as plt
 
 if __name__ == "__main__":
-    set_numpy_seed(seed=15)
+
     env = PendulumEnvironment()
     ddpg = DDPG.DDPG(env)
-    ddpg.fit(render=True)
+    ddpg.fit(render=False)
     ddpg.plot_reward()
     plt.show()
