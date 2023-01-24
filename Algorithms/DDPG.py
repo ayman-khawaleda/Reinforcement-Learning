@@ -12,8 +12,8 @@ from tqdm import tqdm
 
 
 class DDPG(RLAlgorithm):
-    def __init__(self, env, total_episodes=100, tau=5e-3, actor_lr=2e-3, critic_lr=1e-3, batch_size=64, max_len_buffer=5e4, gamma=0.99, epsilon=0.9, decay=0.99, min_epsilon=0.1, std_noise=0.2):
-        super().__init__(env, total_episodes, actor_lr, gamma, epsilon, decay, min_epsilon)
+    def __init__(self, env, total_episodes=100, tau=5e-3, actor_lr=2e-3, critic_lr=1e-3, batch_size=64, max_len_buffer=5e4, gamma=0.99, std_noise=0.2):
+        super().__init__(env, total_episodes, actor_lr, gamma, None, None, None)
         self.algorithm_name = "DDPG"
         self.tau = tau
         self.actor_lr = actor_lr
@@ -96,6 +96,7 @@ class DDPG(RLAlgorithm):
         )
 
     def policy(self, state, *args, **kwargs):
+        state = tf.expand_dims(tf.convert_to_tensor(state), 0)
         sampled_actions = tf.squeeze(self.__actor_model(state))
         sampled_actions = sampled_actions.numpy() + self.ou_noise()
         legal_action = np.clip(
@@ -120,8 +121,7 @@ class DDPG(RLAlgorithm):
             while not done:
                 if render:
                     self.env.render()
-                tf_prev_state = tf.expand_dims(tf.convert_to_tensor(prev_state), 0)
-                action = self.policy(tf_prev_state)
+                action = self.policy(prev_state)
                 state, reward, done = self.env.next_state(action)
 
                 self.memory.remember((prev_state, action, reward, state))
@@ -133,6 +133,7 @@ class DDPG(RLAlgorithm):
 
             ep_reward_list.append(episodic_reward)
             avg_reward = np.mean(ep_reward_list[-40:])
+            # print(f"Avg Reward: {avg_reward}")
             self.avg_reward_list.append(avg_reward)
             self.env.close()
     
